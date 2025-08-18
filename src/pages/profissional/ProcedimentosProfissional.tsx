@@ -22,6 +22,7 @@ export default function ListarProcedimentos() {
     try {
       const response = await api.get(`/procedimentos/${id}`);
       setProcedimentos(response.data);
+      setErro(""); // limpa erro no sucesso
     } catch (error) {
       setErro("Erro ao carregar procedimentos.");
     }
@@ -35,14 +36,21 @@ export default function ListarProcedimentos() {
     if (confirm("Tem certeza que deseja deletar este procedimento?")) {
       try {
         await api.delete(`/procedimentos/${procId}`);
+        setErro(""); // limpa erro no sucesso
         carregarProcedimentos();
       } catch {
-        alert("Erro ao deletar.");
+        setErro("Erro ao deletar.");
       }
     }
   };
 
   const salvarEdicao = async (procId: string) => {
+    // mesma validação do adicionar
+    if (!nomeEdit || !descricaoEdit || !precoEdit || !duracaoEdit) {
+      setErro("Preencha todos os campos antes de adicionar.");
+      return;
+    }
+
     try {
       await api.put(`/procedimentos/${procId}`, {
         id: procId,
@@ -53,18 +61,23 @@ export default function ListarProcedimentos() {
         profissional_id: id,
       });
       if (imagemEdit) {
-        await api.put(`/upload/procedimento/${procId}`, { imagem_url: imagemEdit });
+        await api.put(`/upload/procedimento/${procId}`, {
+          imagem_url: imagemEdit,
+        });
       }
+      setErro(""); // limpa erro no sucesso
       setEditandoId(null);
       carregarProcedimentos();
     } catch {
-      alert("Erro ao atualizar procedimento.");
+      setErro("Erro ao atualizar procedimento.");
     }
   };
 
   const adicionarProcedimento = async () => {
+    setErro(""); // limpa erro antes de tentar novamente
+
     if (!novoNome || !novaDescricao || !novoPreco || !novaDuracao) {
-      alert("Preencha todos os campos antes de adicionar.");
+      setErro("Preencha todos os campos antes de adicionar.");
       return;
     }
 
@@ -79,7 +92,9 @@ export default function ListarProcedimentos() {
 
       const novoId = response.data.id;
       if (imagemEdit) {
-        await api.put(`/upload/procedimento/${novoId}`, { imagem_url: imagemEdit });
+        await api.put(`/upload/procedimento/${novoId}`, {
+          imagem_url: imagemEdit,
+        });
       }
 
       setNovoNome("");
@@ -88,9 +103,10 @@ export default function ListarProcedimentos() {
       setNovaDuracao("");
       setImagemEdit("");
       setMostrarFormulario(false);
+      setErro(""); // limpa erro no sucesso
       carregarProcedimentos();
     } catch {
-      alert("Erro ao adicionar procedimento.");
+      setErro("Erro ao adicionar procedimento.");
     }
   };
 
@@ -108,7 +124,10 @@ export default function ListarProcedimentos() {
 
         {!mostrarFormulario ? (
           <div className="text-end mb-4">
-            <button className="btn btn-success" onClick={() => setMostrarFormulario(true)}>
+            <button
+              className="btn btn-success"
+              onClick={() => setMostrarFormulario(true)}
+            >
               <i className="bi bi-plus-circle me-1"></i> Novo Procedimento
             </button>
           </div>
@@ -149,8 +168,16 @@ export default function ListarProcedimentos() {
               onChange={(e) => setImagemEdit(e.target.value)}
             />
             <div className="text-end">
-              <button className="btn btn-secondary me-2" onClick={() => setMostrarFormulario(false)}>Cancelar</button>
-              <button className="btn btn-success" onClick={adicionarProcedimento}>
+              <button
+                className="btn btn-secondary me-2"
+                onClick={() => setMostrarFormulario(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                className="btn btn-success"
+                onClick={adicionarProcedimento}
+              >
                 <i className="bi bi-check-lg"></i> Adicionar
               </button>
             </div>
@@ -158,13 +185,17 @@ export default function ListarProcedimentos() {
         )}
 
         {!procedimentos || procedimentos.length === 0 ? (
-          <div className="alert alert-info text-center">Nenhum procedimento encontrado.</div>
+          <div className="alert alert-info text-center">
+            Nenhum procedimento encontrado.
+          </div>
         ) : (
           procedimentos.map((proc: any) => (
             <div className="border rounded p-3 mb-3 shadow-sm" key={proc.id}>
               <div className="d-flex align-items-center">
                 <img
-                  src={proc.imagem_url || "https://placehold.co/120x120?text=Foto"}
+                  src={
+                    proc.imagem_url || "https://placehold.co/120x120?text=Foto"
+                  }
                   alt={proc.nome}
                   className="img-fluid me-3"
                   style={{
@@ -177,9 +208,22 @@ export default function ListarProcedimentos() {
                 <div className="flex-grow-1">
                   {editandoId === proc.id ? (
                     <>
-                      <input className="form-control mb-2" value={nomeEdit} onChange={e => setNomeEdit(e.target.value)} />
-                      <textarea className="form-control mb-2" value={descricaoEdit} onChange={e => setDescricaoEdit(e.target.value)} />
-                      <input className="form-control mb-2" type="number" value={precoEdit} onChange={e => setPrecoEdit(e.target.value)} />
+                      <input
+                        className="form-control mb-2"
+                        value={nomeEdit}
+                        onChange={(e) => setNomeEdit(e.target.value)}
+                      />
+                      <textarea
+                        className="form-control mb-2"
+                        value={descricaoEdit}
+                        onChange={(e) => setDescricaoEdit(e.target.value)}
+                      />
+                      <input
+                        className="form-control mb-2"
+                        type="number"
+                        value={precoEdit}
+                        onChange={(e) => setPrecoEdit(e.target.value)}
+                      />
                       <input
                         className="form-control mb-2"
                         type="number"
@@ -195,10 +239,16 @@ export default function ListarProcedimentos() {
                         onChange={(e) => setImagemEdit(e.target.value)}
                       />
                       <div className="text-end">
-                        <button className="btn btn-sm btn-success me-2" onClick={() => salvarEdicao(proc.id)}>
+                        <button
+                          className="btn btn-sm btn-success me-2"
+                          onClick={() => salvarEdicao(proc.id)}
+                        >
                           <i className="bi bi-check-lg"></i> Salvar
                         </button>
-                        <button className="btn btn-sm btn-secondary" onClick={() => setEditandoId(null)}>
+                        <button
+                          className="btn btn-sm btn-secondary"
+                          onClick={() => setEditandoId(null)}
+                        >
                           Cancelar
                         </button>
                       </div>
@@ -206,21 +256,38 @@ export default function ListarProcedimentos() {
                   ) : (
                     <>
                       <h5>{proc.nome}</h5>
-                      <p><strong>Descrição:</strong> {proc.descricao}</p>
-                      <p><strong>Preço:</strong> R$ {Number(proc.preco).toFixed(2)}</p>
-                      <p><strong>Duração:</strong> {Number(proc.duracao_min)} minutos</p>
+                      <p>
+                        <strong>Descrição:</strong> {proc.descricao}
+                      </p>
+                      <p>
+                        <strong>Preço:</strong> R${" "}
+                        {Number(proc.preco).toFixed(2)}
+                      </p>
+                      <p>
+                        <strong>Duração:</strong> {Number(proc.duracao_min)}{" "}
+                        minutos
+                      </p>
                       <div className="text-end">
-                        <button className="btn btn-sm btn-outline-danger me-2" onClick={() => deletar(proc.id)}>
+                        <button
+                          className="btn btn-sm btn-outline-danger me-2"
+                          onClick={() => deletar(proc.id)}
+                        >
                           <i className="bi bi-trash"></i> Deletar
                         </button>
-                        <button className="btn btn-sm btn-outline-primary" onClick={() => {
-                          setEditandoId(proc.id);
-                          setNomeEdit(proc.nome);
-                          setDescricaoEdit(proc.descricao);
-                          setPrecoEdit(String(proc.preco));
-                          setDuracaoEdit(String(proc.duracao_min));
-                          setImagemEdit(proc.imagem_url || "https://placehold.co/120x120?text=Foto");
-                        }}>
+                        <button
+                          className="btn btn-sm btn-outline-primary"
+                          onClick={() => {
+                            setEditandoId(proc.id);
+                            setNomeEdit(proc.nome);
+                            setDescricaoEdit(proc.descricao);
+                            setPrecoEdit(String(proc.preco));
+                            setDuracaoEdit(String(proc.duracao_min));
+                            setImagemEdit(
+                              proc.imagem_url ||
+                                "https://placehold.co/120x120?text=Foto"
+                            );
+                          }}
+                        >
                           <i className="bi bi-pencil-square"></i> Editar
                         </button>
                       </div>

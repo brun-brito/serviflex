@@ -50,6 +50,7 @@ export default function MeusAgendamentos() {
         setAgendamentos(agendamentosComNomes);
       } catch (error) {
         console.error("Erro ao carregar agendamentos:", error);
+        alert("Erro ao carregar agendamentos:");
       } finally {
         setCarregando(false);
       }
@@ -79,17 +80,18 @@ export default function MeusAgendamentos() {
                 className="mb-4 card-body text-center"
                 style={{ wordBreak: "break-word" }}
               >
-                <div
-                  className="card shadow-sm p-3"
-                  style={{ width: "100%" }}
-                >
+                <div className="card shadow-sm p-3" style={{ width: "100%" }}>
                   <div className="card-body text-center">
                     <h5 className="card-title">{ag.procedimento}</h5>
                     <p className="card-text mb-2">
                       <strong>Data:</strong>{" "}
-                      {format(new Date(ag.data_hora), "dd 'de' MMMM 'às' HH:mm", {
-                        locale: ptBR,
-                      })}
+                      {format(
+                        new Date(ag.data_hora),
+                        "dd 'de' MMMM 'às' HH:mm",
+                        {
+                          locale: ptBR,
+                        }
+                      )}
                     </p>
                     <p className="card-text mb-0">
                       <strong>Profissional:</strong> {ag.profissional_nome}

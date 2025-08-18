@@ -38,11 +38,16 @@ export default function VerAgenda() {
   );
   const [horariosGerados, setHorariosGerados] = useState<string[]>([]);
 
+  const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">(
+    "idle"
+  );
+
   useEffect(() => {
     if (!idProfissional) return;
 
     const carregarHorarios = async () => {
       try {
+        setStatus("loading");
         const response = await api.get(`/horarios/${idProfissional}`);
         if (Array.isArray(response.data)) {
           const horariosFiltrados = response.data.filter(
@@ -55,8 +60,10 @@ export default function VerAgenda() {
           );
           setDiasDisponiveis(dias);
         }
+        setStatus("ok");
       } catch (error) {
         console.error("Erro ao buscar horários:", error);
+        setStatus("error");
       }
     };
 
@@ -140,21 +147,36 @@ export default function VerAgenda() {
         </h2>
 
         <div className="d-flex justify-content-center mb-4">
-          <DayPicker
-            mode="single"
-            selected={dataSelecionada}
-            onSelect={setDataSelecionada}
-            locale={ptBR}
-            weekStartsOn={0}
-            className="border rounded p-3"
-            disabled={desabilitarDias}
-          />
+          {status === "error" ? (
+            <div className="alert alert-danger text-center">
+              Não foi possível carregar os horários. Tente novamente mais tarde.
+            </div>
+          ) : (
+            <>
+              {status === "loading" && (
+                <div className="alert alert-secondary text-center">
+                  Carregando horários…
+                </div>
+              )}
+              <DayPicker
+                mode="single"
+                selected={dataSelecionada}
+                onSelect={setDataSelecionada}
+                locale={ptBR}
+                weekStartsOn={0}
+                className="border rounded p-3"
+                disabled={desabilitarDias}
+              />
+            </>
+          )}
         </div>
 
         <h5 className="text-center mb-3">
           Horários disponíveis em:{" "}
           {dataSelecionada
-            ? format(dataSelecionada, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
+            ? format(dataSelecionada, "dd 'de' MMMM 'de' yyyy", {
+                locale: ptBR,
+              })
             : "Selecione uma data"}
         </h5>
 
@@ -163,16 +185,18 @@ export default function VerAgenda() {
             Nenhum horário disponível nesse dia.
           </div>
         ) : (
-          <div className="row justify-content-center">
+          <div
+            className="d-grid"
+            style={{ gridTemplateColumns: "repeat(3, 1fr)", gap: "0.5rem" }}
+          >
             {horariosGerados.map((hora, idx) => (
-              <div key={idx} className="col-3 col-md-2 m-2">
-                <button
-                  className="btn btn-outline-primary w-100"
-                  onClick={() => selecionarHorario(hora)}
-                >
-                  {hora}
-                </button>
-              </div>
+              <button
+                key={idx}
+                className="btn btn-outline-primary w-100"
+                onClick={() => selecionarHorario(hora)}
+              >
+                {hora}
+              </button>
             ))}
           </div>
         )}
