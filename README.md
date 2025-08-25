@@ -1,54 +1,38 @@
-# React + TypeScript + Vite
+# Serviflex
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Serviflex é uma aplicação desenvolvida para facilitar a gestão de serviços flexíveis para profissionais da beleza, permitindo o cadastro, acompanhamento e administração de demandas de forma eficiente.
 
-Currently, two official plugins are available:
+## Funcionalidades
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Cadastro de usuários do tipo Cliente e Profissional
+- Cadastro e gerenciamento de serviços 
+- Agendamento de horários
 
-## Expanding the ESLint configuration
+## Instalação
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. Clone o repositório:
+   ```
+   git clone https://github.com/brun-brito/serviflex.git
+   ```
+2. Acesse o diretório do projeto:
+   ```
+   cd serviflex
+   ```
+3. Instale as dependências:
+   ```
+   npm install
+   ```
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## Uso
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+1. Inicie o servidor de desenvolvimento:
+   ```
+   npm start
+   ```
+   ou
+2. Acesse a aplicação em `http://localhost:3000` (ou porta configurada).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Estrutura do Projeto
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+- `/src`: Código-fonte da aplicação
+- `/public`: Arquivos públicos e estáticos
