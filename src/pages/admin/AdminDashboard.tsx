@@ -6,14 +6,6 @@ export default function AdminDashboard() {
   return (
     <div className="container my-4">
       <h2 className="mb-4">Painel Administrativo</h2>
-      <div className="mb-3 text-end">
-        <button
-          className="btn btn-outline-secondary"
-          onClick={() => navigate("/admin/meu-perfil")}
-        >
-          Meu Perfil
-        </button>
-      </div>
       
       <div className="d-flex flex-column align-items-center gap-3">
         <div className="card" style={{ width: "100%", maxWidth: "500px" }}>
