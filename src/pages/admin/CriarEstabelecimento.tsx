@@ -15,10 +15,11 @@ export default function CriarEstabelecimento() {
     fotoURL: "",
     categoria: "",
     localizacao: {
-      endereco: "",
-      cidade: "",
-      uf: ""
-    }
+      Endereco: "",
+      Cidade: "",
+      UF: ""
+    },
+    responsavel_uid: ""
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -30,7 +31,7 @@ export default function CriarEstabelecimento() {
         ...prev,
         localizacao: {
           ...prev.localizacao,
-          [field]: value
+          [field.charAt(0).toUpperCase() + field.slice(1)]: value
         }
       }));
     } else {
@@ -47,13 +48,20 @@ export default function CriarEstabelecimento() {
     setErro("");
     setSucesso("");
 
+    // Vincular responsavel_uid do usuário logado
+    const usuarioId = localStorage.getItem("usuarioId");
+    const estabelecimentoPayload = {
+      ...estabelecimento,
+      responsavel_uid: usuarioId,
+    };
+
     console.log("=== DEBUG: Criando estabelecimento ===");
-    console.log("Dados sendo enviados:", JSON.stringify(estabelecimento, null, 2));
-    console.log("FotoURL:", estabelecimento.fotoURL);
+    console.log("Dados sendo enviados:", JSON.stringify(estabelecimentoPayload, null, 2));
+    console.log("FotoURL:", estabelecimentoPayload.fotoURL);
     console.log("=====================================");
 
     try {
-      const response = await api.post("/estabelecimentos", estabelecimento);
+      const response = await api.post("/estabelecimentos", estabelecimentoPayload);
       setSucesso("Estabelecimento criado com sucesso!");
       console.log("Estabelecimento criado:", response.data);
       
@@ -176,15 +184,15 @@ export default function CriarEstabelecimento() {
 
                 <div className="row">
                   <div className="col-12 mb-3">
-                    <label htmlFor="localizacao.endereco" className="form-label">
+                    <label htmlFor="localizacao.Endereco" className="form-label">
                       Endereço <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control"
-                      id="localizacao.endereco"
-                      name="localizacao.endereco"
-                      value={estabelecimento.localizacao.endereco}
+                      id="localizacao.Endereco"
+                      name="localizacao.Endereco"
+                      value={estabelecimento.localizacao.Endereco}
                       onChange={handleInputChange}
                       required
                       placeholder="Rua, número, bairro"
@@ -192,29 +200,29 @@ export default function CriarEstabelecimento() {
                   </div>
 
                   <div className="col-md-8 mb-3">
-                    <label htmlFor="localizacao.cidade" className="form-label">
+                    <label htmlFor="localizacao.Cidade" className="form-label">
                       Cidade <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control"
-                      id="localizacao.cidade"
-                      name="localizacao.cidade"
-                      value={estabelecimento.localizacao.cidade}
+                      id="localizacao.Cidade"
+                      name="localizacao.Cidade"
+                      value={estabelecimento.localizacao.Cidade}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
 
                   <div className="col-md-4 mb-3">
-                    <label htmlFor="localizacao.uf" className="form-label">
+                    <label htmlFor="localizacao.UF" className="form-label">
                       UF <span className="text-danger">*</span>
                     </label>
                     <select
                       className="form-select"
-                      id="localizacao.uf"
-                      name="localizacao.uf"
-                      value={estabelecimento.localizacao.uf}
+                      id="localizacao.UF"
+                      name="localizacao.UF"
+                      value={estabelecimento.localizacao.UF}
                       onChange={handleInputChange}
                       required
                     >

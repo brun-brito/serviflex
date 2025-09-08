@@ -5,11 +5,12 @@ export interface Estabelecimento {
     fotoURL?: string;
     categoria: string;
     localizacao: {
-      endereco: string;
-      cidade: string;
-      uf: string;
+      Endereco: string;
+      Cidade: string;
+      UF: string;
     };
     criadoEm?: string;
+    responsavel_uid?: string;
     responsavelUid?: string;
   }
 
@@ -17,16 +18,16 @@ export interface Estabelecimento {
     id: string;
     nome: string;
     descricao: string;
-    preco: number; // Adicionado o campo preço
-    duracao_min: number; // Adicionado o campo duração em minutos
-    imagem_url?: string; // Imagem do procedimento
+    preco: number;
+    duracao_min: number;
+    imagem_url?: string;
 }
 
 
 export interface Agendamento {
   id: string;
   cliente_id: string;
-  cliente_nome?: string; // novo campo
+  cliente_nome?: string;
   procedimento: string;
   data_hora: string;
   profissional_id: string;

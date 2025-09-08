@@ -3,127 +3,71 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { ptBR } from "date-fns/locale";
-import { format, addHours, setHours, setMinutes } from "date-fns";
+import { format } from "date-fns";
 import api from "../../services/api";
-
-interface HorarioDisponivel {
-  id: string;
-  profissional_id: string;
-  dia_semana: string;
-  hora_inicio: string;
-  hora_fim: string;
-  disponivel: boolean;
-}
-
-// 🔤 Utilitário para remover acentos
-const normalizarDia = (dia: string) =>
-  dia
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
 
 export default function VerAgenda() {
   const { idProfissional } = useParams();
   const location = useLocation();
   const procedimento = location.state?.procedimento;
+  const procedimentoId = procedimento?.id;
+  const estabelecimentoId = location.state?.estabelecimentoId || "";
   const navigate = useNavigate();
   const idCliente = localStorage.getItem("usuarioId");
 
-  const [horariosDisponiveis, setHorariosDisponiveis] = useState<
-    HorarioDisponivel[]
-  >([]);
   const [diasDisponiveis, setDiasDisponiveis] = useState<string[]>([]);
-  const [dataSelecionada, setDataSelecionada] = useState<Date | undefined>(
-    new Date()
-  );
+  const [dataSelecionada, setDataSelecionada] = useState<Date | undefined>(new Date());
   const [horariosGerados, setHorariosGerados] = useState<string[]>([]);
+  const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
 
-  const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">(
-    "idle"
-  );
-
+  // Buscar dias disponíveis (dias da semana com horários cadastrados)
   useEffect(() => {
     if (!idProfissional) return;
-
-    const carregarHorarios = async () => {
+    const carregarDias = async () => {
       try {
         setStatus("loading");
         const response = await api.get(`/horarios/${idProfissional}`);
         if (Array.isArray(response.data)) {
-          const horariosFiltrados = response.data.filter(
-            (h: HorarioDisponivel) => h.disponivel
-          );
-          setHorariosDisponiveis(horariosFiltrados);
-
-          const dias = horariosFiltrados.map((h: HorarioDisponivel) =>
-            normalizarDia(h.dia_semana)
-          );
+          const dias = response.data
+            .filter((h: any) => h.disponivel)
+            .map((h: any) =>
+              h.dia_semana
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .toLowerCase()
+            );
           setDiasDisponiveis(dias);
         }
         setStatus("ok");
-      } catch (error) {
-        console.error("Erro ao buscar horários:", error);
+      } catch {
         setStatus("error");
       }
     };
-
-    carregarHorarios();
+    carregarDias();
   }, [idProfissional]);
 
+  // Buscar horários disponíveis para o dia selecionado e procedimento
   useEffect(() => {
-    if (!dataSelecionada) return;
-
-    const diasSemana = [
-      "domingo",
-      "segunda",
-      "terca",
-      "quarta",
-      "quinta",
-      "sexta",
-      "sabado",
-    ];
-    const diaSemana = diasSemana[dataSelecionada.getDay()];
-
-    const horariosDoDia = horariosDisponiveis.filter(
-      (h) => normalizarDia(h.dia_semana) === diaSemana && h.disponivel
-    );
-
-    if (horariosDoDia.length > 0) {
-      const { hora_inicio, hora_fim } = horariosDoDia[0]; // assume um intervalo por dia
-      const [hiH, hiM] = hora_inicio.split(":").map(Number);
-      const [hfH, hfM] = hora_fim.split(":").map(Number);
-
-      let atual = setMinutes(setHours(dataSelecionada, hiH), hiM);
-      const fim = setMinutes(setHours(dataSelecionada, hfH), hfM);
-
-      const horarios: string[] = [];
-      while (atual < fim) {
-        horarios.push(format(atual, "HH:mm"));
-        atual = addHours(atual, 1);
-      }
-
-      setHorariosGerados(horarios);
-    } else {
+    if (!idProfissional || !dataSelecionada || !procedimentoId) {
       setHorariosGerados([]);
+      return;
     }
-  }, [dataSelecionada, horariosDisponiveis]);
-
-  const selecionarHorario = (hora: string) => {
-    if (!dataSelecionada) return;
-
-    const [h, m] = hora.split(":").map(Number);
-    const dataHora = new Date(dataSelecionada);
-    dataHora.setHours(h, m, 0, 0);
-
-    navigate("/ConfirmarAgendamento", {
-      state: {
-        cliente_id: idCliente,
-        profissional_id: idProfissional,
-        procedimento: procedimento?.nome || "Procedimento",
-        dataHora,
-      },
-    });
-  };
+    const buscarHorarios = async () => {
+      setStatus("loading");
+      try {
+        const dataStr = format(dataSelecionada, "yyyy-MM-dd");
+        const resp = await api.get(
+          `/profissionais/${idProfissional}/horarios-disponiveis?data=${dataStr}&procedimento_id=${procedimentoId}`
+        );
+        setHorariosGerados(Array.isArray(resp.data.horarios) ? resp.data.horarios : []);
+        setStatus("ok");
+      } catch {
+        setHorariosGerados([]);
+        setStatus("error");
+      }
+    };
+    buscarHorarios();
+  }, [idProfissional, dataSelecionada, procedimentoId]);
 
   const desabilitarDias = (date: Date) => {
     const diasSemana = [
@@ -139,9 +83,37 @@ export default function VerAgenda() {
     return !diasDisponiveis.includes(nomeDia);
   };
 
+  const selecionarHorario = (hora: string) => {
+    if (!dataSelecionada) return;
+    const [h, m] = hora.split(":").map(Number);
+    const dataHora = new Date(dataSelecionada);
+    dataHora.setHours(h, m, 0, 0);
+
+    navigate("/ConfirmarAgendamento", {
+      state: {
+        cliente_id: idCliente,
+        profissional_id: idProfissional,
+        procedimento: procedimento?.nome || "Procedimento",
+        dataHora,
+        estabelecimentoId,
+        valor: procedimento?.preco || 0
+      },
+    });
+  };
+
   return (
     <div className="container my-5 d-flex justify-content-center">
       <div style={{ minWidth: "350px", maxWidth: "400px", width: "100%" }}>
+        <button
+          className="btn btn-link mb-3"
+          onClick={() =>
+            procedimento?.profissional_id
+              ? navigate(`/procedimentos/${procedimento.profissional_id}`)
+              : navigate(-1)
+          }
+        >
+          &larr; Voltar
+        </button>
         <h2 className="text-center mb-4">
           {procedimento?.nome || "Agendamento"}
         </h2>
@@ -200,13 +172,6 @@ export default function VerAgenda() {
             ))}
           </div>
         )}
-
-        <button
-          className="btn btn-secondary mt-4"
-          onClick={() => navigate(`/procedimentos/${idProfissional}`)}
-        >
-          Voltar para os procedimentos
-        </button>
       </div>
     </div>
   );

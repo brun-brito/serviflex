@@ -3,14 +3,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import api from "../../services/api";
 
 interface ProfissionalEstabelecimento {
-  uid: string;
-  nome: string;
-  status: string;
-  adicionadoEm: string;
+  UID: string;
+  Nome?: string;
+  Status: string;
+  AdicionadoEm: string;
 }
 
 export default function ProfissionaisEstabelecimento() {
   const [profissionais, setProfissionais] = useState<ProfissionalEstabelecimento[]>([]);
+  const [nomesProfissionais, setNomesProfissionais] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
   const [estabelecimentoNome, setEstabelecimentoNome] = useState("");
@@ -19,12 +20,25 @@ export default function ProfissionaisEstabelecimento() {
 
   const carregarProfissionais = async () => {
     if (!id) return;
-    
     setLoading(true);
     setErro("");
     try {
       const response = await api.get(`/estabelecimentos/${id}/profissionais`);
       setProfissionais(response.data || []);
+      // Buscar nomes dos profissionais
+      const uids = (response.data || []).map((p: ProfissionalEstabelecimento) => p.UID);
+      const nomes: Record<string, string> = {};
+      await Promise.all(
+        uids.map(async (uid: string) => {
+          try {
+            const res = await api.get(`/profissionais/${uid}`);
+            nomes[uid] = res.data?.nome || "Nome não informado";
+          } catch {
+            nomes[uid] = "Nome não informado";
+          }
+        })
+      );
+      setNomesProfissionais(nomes);
     } catch (err) {
       setErro("Erro ao carregar profissionais.");
       console.error(err);
@@ -35,7 +49,6 @@ export default function ProfissionaisEstabelecimento() {
 
   const carregarEstabelecimento = async () => {
     if (!id) return;
-    
     try {
       const response = await api.get(`/estabelecimentos/${id}`);
       setEstabelecimentoNome(response.data?.nome || "");
@@ -57,10 +70,9 @@ export default function ProfissionaisEstabelecimento() {
     if (!window.confirm("Tem certeza que deseja remover este profissional?")) {
       return;
     }
-
     try {
       await api.delete(`/estabelecimentos/${id}/profissionais/${profissionalId}`);
-      await carregarProfissionais(); // Recarrega a lista
+      await carregarProfissionais();
     } catch (err) {
       alert("Erro ao remover profissional.");
       console.error(err);
@@ -124,21 +136,21 @@ export default function ProfissionaisEstabelecimento() {
                   </thead>
                   <tbody>
                     {profissionais.map((profissional) => (
-                      <tr key={profissional.uid}>
-                        <td className="font-monospace">{profissional.uid}</td>
-                        <td>{profissional.nome || "Nome não informado"}</td>
+                      <tr key={profissional.UID}>
+                        <td className="font-monospace">{profissional.UID}</td>
+                        <td>{nomesProfissionais[profissional.UID] || "Nome não informado"}</td>
                         <td>
                           <span className={`badge ${
-                            profissional.status === 'ativo' ? 'bg-success' : 'bg-warning'
+                            profissional.Status === 'ativo' ? 'bg-success' : 'bg-warning'
                           }`}>
-                            {profissional.status}
+                            {profissional.Status}
                           </span>
                         </td>
-                        <td>{formatarData(profissional.adicionadoEm)}</td>
+                        <td>{formatarData(profissional.AdicionadoEm)}</td>
                         <td>
                           <button
                             className="btn btn-sm btn-outline-danger"
-                            onClick={() => handleRemoverProfissional(profissional.uid)}
+                            onClick={() => handleRemoverProfissional(profissional.UID)}
                           >
                             Remover
                           </button>

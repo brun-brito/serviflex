@@ -27,6 +27,12 @@ export default function GerenciarEstabelecimentos() {
     carregarEstabelecimentos();
   }, []);
 
+  // Filtrar estabelecimentos pelo responsavelUid do usuário logado
+  const usuarioId = localStorage.getItem("usuarioId");
+  const estabelecimentosFiltrados = estabelecimentos.filter(
+    (est) => est.responsavelUid === usuarioId
+  );
+
   const handleEditar = (id: string) => {
     if (id) {
       navigate(`/admin/estabelecimentos/editar/${id}`);
@@ -68,7 +74,7 @@ export default function GerenciarEstabelecimentos() {
       ) : (
         <div className="card">
           <div className="card-body">
-            {estabelecimentos.length === 0 ? (
+            {estabelecimentosFiltrados.length === 0 ? (
               <div className="text-center text-muted py-4">
                 <p>Nenhum estabelecimento encontrado.</p>
                 <button
@@ -89,7 +95,7 @@ export default function GerenciarEstabelecimentos() {
                     </tr>
                   </thead>
                   <tbody>
-                    {estabelecimentos.map((estabelecimento, index) => (
+                    {estabelecimentosFiltrados.map((estabelecimento, index) => (
                       <tr key={estabelecimento.id || index}>
                         <td style={{ width: "60%" }}>
                           <div className="d-flex align-items-center">

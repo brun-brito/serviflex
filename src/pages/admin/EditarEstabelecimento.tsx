@@ -17,9 +17,9 @@ export default function EditarEstabelecimento() {
     fotoURL: "",
     categoria: "",
     localizacao: {
-      endereco: "",
-      cidade: "",
-      uf: ""
+      Endereco: "",
+      Cidade: "",
+      UF: ""
     }
   });
 
@@ -43,9 +43,9 @@ export default function EditarEstabelecimento() {
         fotoURL: response.data.fotoURL || "",
         categoria: response.data.categoria || "",
         localizacao: {
-          endereco: response.data.localizacao?.Endereco || response.data.localizacao?.endereco || "",
-          cidade: response.data.localizacao?.Cidade || response.data.localizacao?.cidade || "", 
-          uf: response.data.localizacao?.UF || response.data.localizacao?.uf || ""
+          Endereco: response.data.localizacao?.Endereco || response.data.localizacao?.Endereco || "",
+          Cidade: response.data.localizacao?.Cidade || response.data.localizacao?.Cidade || "", 
+          UF: response.data.localizacao?.UF || response.data.localizacao?.UF || ""
         },
         criadoEm: response.data.criadoEm,
         responsavelUid: response.data.responsavelUid
@@ -81,6 +81,19 @@ export default function EditarEstabelecimento() {
         ...prev,
         [name]: value
       }));
+    }
+  };
+
+  const excluirEstabelecimento = async (id: string) => {
+    if (!id) return;
+    if (!window.confirm("Tem certeza que deseja excluir este estabelecimento? Esta ação não pode ser desfeita.")) return;
+    try {
+      await api.delete(`/estabelecimentos/${id}`);
+      alert("Estabelecimento excluído com sucesso!");
+      handleVoltar();
+    } catch (err) {
+      alert("Erro ao excluir estabelecimento.");
+      console.error(err);
     }
   };
 
@@ -230,15 +243,15 @@ export default function EditarEstabelecimento() {
 
                 <div className="row">
                   <div className="col-12 mb-3">
-                    <label htmlFor="localizacao.endereco" className="form-label">
+                    <label htmlFor="localizacao.Endereco" className="form-label">
                       Endereço <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control"
-                      id="localizacao.endereco"
-                      name="localizacao.endereco"
-                      value={estabelecimento.localizacao?.endereco || ""}
+                      id="localizacao.Endereco"
+                      name="localizacao.Endereco"
+                      value={estabelecimento.localizacao?.Endereco || ""}
                       onChange={handleInputChange}
                       required
                       placeholder="Rua, número, bairro"
@@ -246,29 +259,29 @@ export default function EditarEstabelecimento() {
                   </div>
 
                   <div className="col-md-8 mb-3">
-                    <label htmlFor="localizacao.cidade" className="form-label">
+                    <label htmlFor="localizacao.Cidade" className="form-label">
                       Cidade <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control"
-                      id="localizacao.cidade"
-                      name="localizacao.cidade"
-                      value={estabelecimento.localizacao?.cidade || ""}
+                      id="localizacao.Cidade"
+                      name="localizacao.Cidade"
+                      value={estabelecimento.localizacao?.Cidade || ""}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
 
                   <div className="col-md-4 mb-3">
-                    <label htmlFor="localizacao.uf" className="form-label">
+                    <label htmlFor="localizacao.UF" className="form-label">
                       UF <span className="text-danger">*</span>
                     </label>
                     <select
                       className="form-select"
-                      id="localizacao.uf"
-                      name="localizacao.uf"
-                      value={estabelecimento.localizacao?.uf || ""}
+                      id="localizacao.UF"
+                      name="localizacao.UF"
+                      value={estabelecimento.localizacao?.UF || ""}
                       onChange={handleInputChange}
                       required
                     >
@@ -327,6 +340,14 @@ export default function EditarEstabelecimento() {
                     disabled={loading}
                   >
                     Voltar
+                  </button>
+
+                  <button
+                    className="btn btn-sm btn-outline-danger"
+                    onClick={() => excluirEstabelecimento(estabelecimento.id!)}
+                    disabled={!estabelecimento.id}
+                  >
+                    Excluir
                   </button>
                 </div>
               </form>

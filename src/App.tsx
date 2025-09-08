@@ -26,6 +26,9 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import ConvitesProfissional from "./pages/profissional/ConvitesProfissional";
 import EditarPerfilProfissional from "./pages/profissional/EditarPerfilProfissional";
 import EditarPerfilAdmin from "./pages/admin/EditarPerfilAdmin";
+import EditarPerfilCliente from "./pages/cliente/EditarPerfilCliente";
+import ProfissionaisDoEstabelecimento from "./pages/cliente/ProfissionaisEstabelecimento";
+import EditarAgendamento from "./pages/cliente/EditarAgendamento";
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
   const isAuthenticated = localStorage.getItem("usuarioId") !== null;
@@ -139,6 +142,16 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/cliente/editar-perfil"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <EditarPerfilCliente />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
         {/* Rotas de Admin - Estabelecimentos */}
         <Route
           path="/admin"
@@ -206,6 +219,26 @@ function App() {
             <PrivateRoute>
               <Layout>
                 <EditarPerfilAdmin />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/estabelecimento/:id/profissionais"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <ProfissionaisDoEstabelecimento />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/editar-agendamento"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <EditarAgendamento />
               </Layout>
             </PrivateRoute>
           }
