@@ -48,6 +48,7 @@ export default function EditarEstabelecimento() {
           UF: response.data.localizacao?.UF || response.data.localizacao?.UF || ""
         },
         criadoEm: response.data.criadoEm,
+        responsavel_uid: response.data.responsavelUid,
         responsavelUid: response.data.responsavelUid
       };
       
