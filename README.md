@@ -1,12 +1,24 @@
-# Serviflex
+# Serviflex Frontend
 
-Serviflex é uma aplicação desenvolvida para facilitar a gestão de serviços flexíveis para profissionais da beleza, permitindo o cadastro, acompanhamento e administração de demandas de forma eficiente.
+Aplicação web para gestão de serviços, agendamentos e administração de estabelecimentos e profissionais da beleza.
 
 ## Funcionalidades
 
-- Cadastro de usuários do tipo Cliente e Profissional
-- Cadastro e gerenciamento de serviços 
-- Agendamento de horários
+- Cadastro e login de clientes, profissionais e administradores
+- Edição de perfil para todos os tipos de usuário
+- Listagem de estabelecimentos e visualização de profissionais vinculados
+- Cadastro, edição e exclusão de estabelecimentos (admin)
+- Gerenciamento de profissionais em estabelecimentos (admin)
+- Convite e remoção de profissionais em estabelecimentos
+- Aceite e recusa de convites por profissionais
+- Cadastro, edição e exclusão de procedimentos (profissional)
+- Listagem de procedimentos por profissional
+- Cadastro, edição e exclusão de horários de atendimento (profissional)
+- Visualização de horários disponíveis por profissional
+- Agendamento, edição e cancelamento de horários (cliente)
+- Visualização de agendamentos por cliente e profissional
+- Upload de imagens para profissionais e procedimentos
+- Relatórios de faturamento, avaliações e agendamentos (admin e profissional)
 
 ## Instalação
 
@@ -27,10 +39,9 @@ Serviflex é uma aplicação desenvolvida para facilitar a gestão de serviços 
 
 1. Inicie o servidor de desenvolvimento:
    ```
-   npm start
+   npm run dev
    ```
-   ou
-2. Acesse a aplicação em `http://localhost:3000` (ou porta configurada).
+2. Acesse a aplicação em `http://localhost:3000`.
 
 ## Estrutura do Projeto
 
