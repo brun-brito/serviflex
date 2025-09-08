@@ -15,29 +15,23 @@ export default function VisualizarAgendamentos() {
     const profissionalId = localStorage.getItem("usuarioId");
     const navigate = useNavigate();
 
-    const [mostrarFormularioImagem, setMostrarFormularioImagem] = useState(false);
-    const [imagemURL, setImagemURL] = useState("");
-    const [mensagemImagem, setMensagemImagem] = useState("");
-    const [erroImagem, setErroImagem] = useState("");
     const [imagemAtual, setImagemAtual] = useState<string | null>(null);
+    const [nomeEstabelecimento, setNomeEstabelecimento] = useState<string | null>(null);
 
     useEffect(() => {
-        const carregarImagemDoEstabelecimento = async () => {
-            try {
-                const usuarioId = localStorage.getItem("usuarioId");
-                const response = await api.get("/estabelecimentos");
-                if (response.status === 200 && Array.isArray(response.data)) {
-                    const profissional = response.data.find((item: any) => item.id === usuarioId);
-                    if (profissional && profissional.imagem_url) {
-                        setImagemAtual(profissional.imagem_url);
-                    }
-                }
-            } catch (error) {
-                console.error("Erro ao buscar imagem do profissional:", error);
-            }
-        };
+        // Busca a imagem do profissional do localStorage (usuarioObj)
+        const usuarioStr = localStorage.getItem("usuarioObj");
+        if (usuarioStr) {
+            const usuario = JSON.parse(usuarioStr);
+            setImagemAtual(usuario.imagem_url || usuario.fotoUrl || null);
 
-        carregarImagemDoEstabelecimento();
+            // Buscar nome do estabelecimento
+            if (usuario.estabelecimentoId) {
+                api.get(`/estabelecimentos/${usuario.estabelecimentoId}`)
+                  .then(res => setNomeEstabelecimento(res.data.nome))
+                  .catch(() => setNomeEstabelecimento(null));
+            }
+        }
     }, []);
 
     useEffect(() => {
@@ -73,6 +67,13 @@ export default function VisualizarAgendamentos() {
     return (
         <div className="container mt-5 d-flex justify-content-center">
             <div style={{ minWidth: "350px", maxWidth: "400px", width: "100%" }}>
+                {/* Nome do estabelecimento */}
+                {nomeEstabelecimento && (
+                  <div className="alert alert-info text-center mb-3">
+                    Estabelecimento: <b>{nomeEstabelecimento}</b>
+                  </div>
+                )}
+
                 <div className="position-relative mb-4 d-flex justify-content-end">
                     <div style={{ position: "relative", width: "120px", height: "120px" }}>
                         <img
@@ -81,52 +82,8 @@ export default function VisualizarAgendamentos() {
                             className="rounded-circle shadow"
                             style={{ width: "100%", height: "100%", objectFit: "cover" }}
                         />
-                        <button
-                            className="btn btn-light border rounded-circle shadow position-absolute d-flex align-items-center justify-content-center"
-                            style={{ bottom: 0, right: 0, width: '36px', height: '36px', backgroundColor: '#fff' }}
-                            title="Alterar foto de perfil"
-                            onClick={() => setMostrarFormularioImagem(!mostrarFormularioImagem)}
-                        >
-                            <i className="bi bi-pencil-fill text-primary fs-5"></i>
-                        </button>
                     </div>
                 </div>
-
-                {mostrarFormularioImagem && (
-                    <form
-                        className="mb-4"
-                        onSubmit={async (e) => {
-                            e.preventDefault();
-                            setErroImagem("");
-                            setMensagemImagem("");
-                            try {
-                                await api.put(`/upload/profissional/${profissionalId}`, {
-                                    imagem_url: imagemURL,
-                                });
-                                localStorage.setItem("imagem_url", imagemURL);
-                                setImagemAtual(imagemURL);
-                                setMensagemImagem("Imagem atualizada com sucesso!");
-                                setImagemURL("");
-                            } catch (error) {
-                                setErroImagem("Erro ao atualizar imagem.");
-                            }
-                        }}
-                    >
-                        <div className="input-group mb-2">
-                            <input
-                                type="url"
-                                className="form-control"
-                                placeholder="Cole aqui a URL da nova imagem"
-                                value={imagemURL}
-                                onChange={(e) => setImagemURL(e.target.value)}
-                                required
-                            />
-                            <button className="btn btn-primary" type="submit">Salvar</button>
-                        </div>
-                        {mensagemImagem && <div className="alert alert-success">{mensagemImagem}</div>}
-                        {erroImagem && <div className="alert alert-danger">{erroImagem}</div>}
-                    </form>
-                )}
 
                 <h2 className="mb-4 text-center text-secondary">Agenda de {localStorage.getItem("usuarioNome")}</h2>
 
@@ -179,8 +136,15 @@ export default function VisualizarAgendamentos() {
                         className="btn btn-outline-primary me-3 d-inline-flex align-items-center"
                         onClick={() => navigate("/horarios-profissional")}
                     >
-                        <i className="bi bi-pencil me-2"></i>
+                        <i className="bi bi-clock me-2"></i>
                         Editar Horários
+                    </button>
+
+                    <button 
+                        className="btn btn-outline-secondary" 
+                        onClick={() => navigate("/profissional/editar-perfil")}>
+                        <i className="bi bi-pencil me-2"></i>
+                        Editar Perfil
                     </button>
 
                     <button

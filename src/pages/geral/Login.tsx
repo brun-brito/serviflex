@@ -29,11 +29,16 @@ export default function Login() {
             localStorage.setItem("usuarioId", usuario.id);
             localStorage.setItem("usuarioTipo", usuario.tipo);
             localStorage.setItem("usuarioNome", usuario.nome);
+            localStorage.setItem("usuarioObj", JSON.stringify(usuario));
 
             if (usuario.tipo === "clientes") {
                 navigate("/listaEstabelecimentos");
             } else if (usuario.tipo === "profissionais") {
-                navigate("/agendaProfissional");
+                if (usuario.estabelecimentoId) {
+                    navigate("/agendaProfissional");
+                } else {
+                    navigate("/convites-profissional");
+                }
             } else if (usuario.tipo === "admin") {
                 navigate("/admin");
             }
