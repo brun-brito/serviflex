@@ -34,6 +34,8 @@ export default function Login() {
                 navigate("/listaEstabelecimentos");
             } else if (usuario.tipo === "profissionais") {
                 navigate("/agendaProfissional");
+            } else if (usuario.tipo === "admin") {
+                navigate("/admin");
             }
             
         } catch (err: any) {

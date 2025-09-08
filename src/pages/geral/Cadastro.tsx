@@ -83,6 +83,7 @@ export default function Cadastro() {
                         >
                             <option value="clientes">Cliente</option>
                             <option value="profissionais">Profissional</option>
+                            <option value="admin">Administrador</option>
                         </select>
                     </div>
                     <div className="mb-3">

@@ -1,8 +1,16 @@
 export interface Estabelecimento {
-    id: string;
+    id?: string;
     nome: string;
-    email: string;
-    imagem_url?: string;
+    descricao: string;
+    fotoURL?: string;
+    categoria: string;
+    localizacao: {
+      endereco: string;
+      cidade: string;
+      uf: string;
+    };
+    criadoEm?: string;
+    responsavelUid?: string;
   }
 
   export interface Procedimento {

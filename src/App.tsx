@@ -17,6 +17,12 @@ import VerAgenda from "./pages/cliente/VerAgenda";
 import ConfirmarAgendamento from "./pages/cliente/ConfirmarAgendamento";
 import ProcedimentosProfissional from "./pages/profissional/ProcedimentosProfissional";
 import MeusAgendamentos from "./pages/cliente/MeusAgendamentos";
+import GerenciarEstabelecimentos from "./pages/admin/GerenciarEstabelecimentos";
+import CriarEstabelecimento from "./pages/admin/CriarEstabelecimento";
+import EditarEstabelecimento from "./pages/admin/EditarEstabelecimento";
+import ProfissionaisEstabelecimento from "./pages/admin/ProfissionaisEstabelecimento";
+import AdicionarProfissional from "./pages/admin/AdicionarProfissional";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
   const isAuthenticated = localStorage.getItem("usuarioId") !== null;
@@ -105,6 +111,67 @@ function App() {
             <PrivateRoute>
               <Layout>
                 <MeusAgendamentos />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        {/* Rotas de Admin - Estabelecimentos */}
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <AdminDashboard />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/estabelecimentos"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <GerenciarEstabelecimentos />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/estabelecimentos/criar"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <CriarEstabelecimento />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/estabelecimentos/editar/:id"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <EditarEstabelecimento />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/estabelecimentos/:id/profissionais"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <ProfissionaisEstabelecimento />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/estabelecimentos/:id/profissionais/adicionar"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <AdicionarProfissional />
               </Layout>
             </PrivateRoute>
           }

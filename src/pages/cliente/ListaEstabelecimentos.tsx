@@ -44,9 +44,9 @@ export default function ListarEstabelecimentos() {
               className="d-flex align-items-center mb-4 p-3 border rounded shadow-sm"
               style={{ backgroundColor: "#f9f9f9" }}
             >
-              {estabelecimento.imagem_url && (
+              {estabelecimento.fotoURL && (
                 <img
-                  src={estabelecimento.imagem_url}
+                  src={estabelecimento.fotoURL}
                   alt={estabelecimento.nome}
                   className="img-fluid"
                   style={{
